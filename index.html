@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trump Quiz</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center;
+            background: url('https://raw.githubusercontent.com/JOUWGITHUBNAAM/JOUWREPO/main/A_cartoon-style_background_representing_America,_f.png') no-repeat center center fixed; 
+            background-size: cover;
+            color: #002868;
+            position: relative;
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.6);
+            z-index: -1;
+        }
+        h1, h2 { color: #bf0a30; }
+        .hidden { display: none; }
+        button {
+            background-color: #bf0a30;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background-color: #a00; }
+        ul { list-style: none; padding: 0; }
+        li { background: rgba(255, 255, 255, 0.8); margin: 5px; padding: 10px; border-radius: 5px; }
+        img { width: 200px; margin: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Trump Quiz</h1>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Donald_Trump_official_portrait.jpg" alt="Donald Trump">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg" alt="Amerikaanse vlag" width="300">
+    
+    <div id="quiz">
+        <p id="question"></p>
+        <button onclick="answer(true)">Ja</button>
+        <button onclick="answer(false)">Nee</button>
+    </div>
+    
+    <div id="result" class="hidden">
+        <p>Je score: <span id="score"></span></p>
+        <input type="text" id="name" placeholder="Jouw naam">
+        <button onclick="saveScore()">Opslaan</button>
+        <button onclick="restartQuiz()">Opnieuw spelen</button>
+    </div>
+    
+    <h2>Leaderboard</h2>
+    <ul id="leaderboard"></ul>
+    <button onclick="resetLeaderboard()">Leaderboard resetten</button>
+    
+    <script>
+        const questions = [
+            { text: "Werd Donald Trump in 2016 tot president verkozen?", correct: true },
+            { text: "Heeft Trump ooit een Nobelprijs voor de Vrede gewonnen?", correct: false },
+            { text: "Was Trump een zakenman voordat hij president werd?", correct: true }
+        ];
+        let currentQuestion = 0;
+        let score = 0;
+
+        function showQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById("question").textContent = questions[currentQuestion].text;
+            } else {
+                document.getElementById("quiz").classList.add("hidden");
+                document.getElementById("result").classList.remove("hidden");
+                document.getElementById("score").textContent = score;
+                showLeaderboard();
+            }
+        }
+
+        function answer(choice) {
+            if (choice === questions[currentQuestion].correct) {
+                score++;
+            }
+            currentQuestion++;
+            showQuestion();
+        }
+
+        function saveScore() {
+            let name = document.getElementById("name").value;
+            if (!name) return;
+            let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            scores.push({ name, score });
+            scores.sort((a, b) => b.score - a.score);
+            localStorage.setItem("leaderboard", JSON.stringify(scores));
+            showLeaderboard();
+        }
+
+        function showLeaderboard() {
+            let scores = JSON.parse(localStorage.getItem("leaderboard")) || [];
+            let list = document.getElementById("leaderboard");
+            list.innerHTML = scores.map(s => `<li>${s.name}: ${s.score}</li>`).join("");
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            document.getElementById("quiz").classList.remove("hidden");
+            document.getElementById("result").classList.add("hidden");
+            showQuestion();
+        }
+
+        function resetLeaderboard() {
+            localStorage.removeItem("leaderboard");
+            showLeaderboard();
+        }
+
+        showQuestion();
+        showLeaderboard();
+    </script>
+</body>
+</html>
