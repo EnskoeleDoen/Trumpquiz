@@ -32,7 +32,6 @@
       border-radius: 15px;
       text-align: center;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      /* Zoom/blur effecten verwijderd */
     }
     .btn {
       background: linear-gradient(45deg, #4b79a1, #283e51);
@@ -115,14 +114,8 @@
       width: 20px;
       height: calc(100% + 10px);
       background: radial-gradient(circle, rgba(0,123,255,1) 0%, rgba(0,123,255,0.7) 60%, transparent 70%);
-      filter: blur(2px);
-      animation: flame 0.8s infinite alternate;
       pointer-events: none;
       border-radius: 50%;
-    }
-    @keyframes flame {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.2) rotate(10deg); opacity: 0.8; }
     }
     .leaderboard ol, .name-container ol {
       padding: 0;
@@ -134,17 +127,16 @@
       margin: 5px 0;
       border-radius: 10px;
     }
-    /* Speciale aanduidingen voor 1e, 2e en 3e plaats */
     .leaderboard li:nth-child(1) {
-      background: #ffd700; /* goud */
+      background: #ffd700;
       color: #000;
     }
     .leaderboard li:nth-child(2) {
-      background: #c0c0c0; /* zilver */
+      background: #c0c0c0;
       color: #000;
     }
     .leaderboard li:nth-child(3) {
-      background: #cd7f32; /* brons */
+      background: #cd7f32;
       color: #000;
     }
     .name-container input {
@@ -178,8 +170,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
+  <!-- Rest van de HTML code blijft hetzelfde -->
   <div class="container">
-    <!-- Startscherm -->
     <div class="start-screen">
       <h1>Robin Quiz</h1>
       <button class="btn" onclick="startQuiz()">Start Quiz</button>
@@ -187,7 +179,6 @@
       <button class="btn" onclick="goToLeaderboard()">Ga naar leaderboard</button>
     </div>
 
-    <!-- Quiz -->
     <div class="quiz-container">
       <div class="question" id="question"></div>
       <div class="options" id="options"></div>
@@ -197,7 +188,6 @@
       <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Volgende</button>
     </div>
 
-    <!-- Naam invoer na quiz -->
     <div class="name-container" id="nameContainer">
       <h2>Quiz voltooid!</h2>
       <p>Je score is: <span id="finalScore"></span></p>
@@ -207,7 +197,6 @@
       <button class="btn" onclick="submitName()">Verzenden</button>
     </div>
 
-    <!-- Leaderboard -->
     <div class="leaderboard">
       <h2>Leaderboard</h2>
       <ol id="leaderboard"></ol>
@@ -217,7 +206,7 @@
   </div>
 
   <script>
-    // Firebase configuratie
+    // Firebase configuratie en JavaScript code blijft hetzelfde
     const firebaseConfig = {
       apiKey: "AIzaSyB170btCZ5e4OKIDUToAPF445Ima-3H208",
       authDomain: "quiz-robin.firebaseapp.com",
@@ -240,8 +229,8 @@
       { question: "Wat is mijn geboortejaar?", options: ["2000", "2001", "2002", "2003"], correct: 2 }
     ];
 
+    // Rest van de JavaScript functies blijven identiek
     function startQuiz() {
-      // Verberg startscherm en andere containers
       document.querySelector('.start-screen').style.display = 'none';
       document.querySelector('.leaderboard').style.display = 'none';
       document.getElementById('nameContainer').style.display = 'none';
@@ -314,7 +303,6 @@
     }
 
     function showLeaderboard() {
-      // Verberg alle andere schermen
       document.querySelector('.start-screen').style.display = 'none';
       document.querySelector('.quiz-container').style.display = 'none';
       document.getElementById('nameContainer').style.display = 'none';
@@ -339,7 +327,6 @@
     }
 
     function goToLeaderboard() {
-      // Verberg alle andere schermen en laad het leaderboard
       document.querySelector('.start-screen').style.display = 'none';
       document.querySelector('.quiz-container').style.display = 'none';
       document.getElementById('nameContainer').style.display = 'none';
@@ -347,7 +334,6 @@
     }
 
     function goHome() {
-      // Ga terug naar het startscherm en reset de velden
       document.querySelector('.leaderboard').style.display = 'none';
       document.querySelector('.start-screen').style.display = 'block';
       document.getElementById('nameInput').value = '';
