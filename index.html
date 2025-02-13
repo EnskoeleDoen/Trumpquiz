@@ -1,259 +1,277 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <title>Robin Persoonlijke Quiz</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            color: #f8fafc;
-            margin: 0;
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .start-screen {
-            padding: 2rem;
-        }
-
-        .profile-img {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 4px solid #38bdf8;
-            margin: 1rem 0;
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
-        }
-
-        .btn {
-            background: #38bdf8;
-            color: #082f49;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin: 1rem;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.4);
-        }
-
-        .quiz-container {
-            display: none;
-        }
-
-        .question {
-            font-size: 1.5rem;
-            margin: 2rem 0;
-            line-height: 1.4;
-        }
-
-        .options {
-            display: grid;
-            gap: 1rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .option {
-            background: rgba(255,255,255,0.05);
-            padding: 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid #334155;
-        }
-
-        .option:hover {
-            background: rgba(56, 189, 248, 0.1);
-            transform: translateX(10px);
-        }
-
-        .selected {
-            background: #38bdf8 !important;
-            color: #082f49;
-            font-weight: 600;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            margin: 2rem 0;
-            border-radius: 4px;
-        }
-
-        .progress {
-            height: 100%;
-            background: #38bdf8;
-            transition: width 0.3s ease;
-            border-radius: 4px;
-        }
-
-        .leaderboard {
-            background: rgba(15, 23, 42, 0.8);
-            padding: 2rem;
-            border-radius: 12px;
-            margin-top: 2rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .leaderboard h2 {
-            color: #38bdf8;
-            margin-bottom: 1.5rem;
-        }
-
-        .leaderboard li {
-            padding: 0.8rem;
-            margin: 0.5rem 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 6px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Robin Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1e1e2f, #2c2c3d);
+      color: white;
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .container {
+      width: 90%;
+      max-width: 500px;
+      background: #3a3a4d;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+    .btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin: 10px 0;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+      transition: 0.3s;
+      display: inline-block;
+    }
+    .btn:hover {
+      background: #0056b3;
+    }
+    .quiz-container, .leaderboard {
+      display: none;
+    }
+    .option {
+      background: #4a4a6d;
+      padding: 12px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-align: center;
+    }
+    .option:hover {
+      background: #626289;
+    }
+    .option.selected {
+      background: #007bff;
+      color: white;
+      font-weight: bold;
+    }
+    .option.correct {
+      background: #28a745 !important;
+    }
+    .option.wrong {
+      background: #dc3545 !important;
+    }
+    .progress-bar {
+      background: #444;
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      position: relative;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #ff4500, #ffa500);
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.3s;
+      position: relative;
+    }
+    .progress::after {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: -5px;
+      width: 20px;
+      height: calc(100% + 10px);
+      background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(255,165,0,0.7) 60%, transparent 70%);
+      filter: blur(2px);
+      animation: flame 0.8s infinite alternate;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    @keyframes flame {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.2) rotate(10deg); opacity: 0.8; }
+    }
+    .leaderboard ol {
+      padding: 0;
+      list-style-type: none;
+    }
+    .leaderboard li {
+      background: #626289;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+    .reset-btn {
+      background: #dc3545;
+      padding: 8px;
+    }
+    .reset-btn:hover {
+      background: #a71d2a;
+    }
+    @media (max-width: 600px) {
+      .container {
+        width: 95%;
+        padding: 15px;
+      }
+      .btn {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+      .option {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
+  </style>
+  
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div class="start-screen">
-            <h1>Robin Persoonlijke Quiz</h1>
-            <img src="robin-profile.jpg" alt="Robin" class="profile-img">
-            <button class="btn" onclick="startQuiz()">Start Quiz</button>
-        </div>
-
-        <div class="quiz-container">
-            <div class="question" id="question"></div>
-            <div class="options" id="options"></div>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
-            </div>
-            <button class="btn" onclick="nextQuestion()" id="nextBtn">Volgende</button>
-        </div>
-
-        <div class="leaderboard">
-            <h2>Leaderboard</h2>
-            <ol id="leaderboard"></ol>
-        </div>
+  <div class="container">
+    <div class="start-screen">
+      <h1>Robin Quiz</h1>
+      <button class="btn" onclick="startQuiz()">Start Quiz</button>
     </div>
 
-    <script>
-        const questions = [
-            {
-                question: "Wat is mijn geboorteplaats?",
-                options: ["Wilrijk", "Willebroek", "Boom", "Schelle"],
-                correct: 0
-            },
-            {
-                question: "Hoe lang heb ik muziekschool gedaan?",
-                options: ["6 jaar", "7 jaar", "8 jaar", "9 jaar"],
-                correct: 2
-            },
-            {
-                question: "Welk huisdier heb ik?",
-                options: ["Hond", "Kat", "Vissen", "Konijn"],
-                correct: 1
-            }
-        ];
+    <div class="quiz-container">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+      </div>
+      <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Volgende</button>
+    </div>
 
-        // Quiz functionaliteit
-        let currentQuestion = 0;
-        let score = 0;
+    <div class="leaderboard">
+      <h2>Leaderboard</h2>
+      <ol id="leaderboard"></ol>
+      <button class="btn reset-btn" onclick="resetLeaderboard()">Reset Leaderboard</button>
+    </div>
+  </div>
 
-        function startQuiz() {
-            document.querySelector('.start-screen').style.display = 'none';
-            document.querySelector('.quiz-container').style.display = 'block';
-            showQuestion();
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB170btCZ5e4OKIDUToAPF445Ima-3H208",
+      authDomain: "quiz-robin.firebaseapp.com",
+      projectId: "quiz-robin",
+      storageBucket: "quiz-robin.firebasestorage.app",
+      messagingSenderId: "233143883084",
+      appId: "1:233143883084:web:372c88f5044cf99df7ebe9"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+
+    let currentQuestion = 0;
+    let score = 0;
+    const questions = [
+      { question: "Wat is mijn geboorteplaats?", options: ["Wilrijk", "Willebroek", "Boom", "Schelle"], correct: 0 },
+      { question: "Welke instrument speel ik?", options: ["Drum", "piano", "trompet", "viool"], correct: 1 },
+      { question: "Welk huisdier heb ik?", options: ["Hond", "Kat", "Vissen", "Konijn"], correct: 1 },
+      { question: "Wat is mijn verjaardag?", options: ["6 Juni", "9 juni", "6 juli", "9 juli"], correct: 2 },
+      { question: "Wat is mijn geboortejaar?", options: ["2000", "2001", "2002", "2003"], correct: 2 }
+    ];
+
+    function startQuiz() {
+      document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.quiz-container').style.display = 'block';
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const question = questions[currentQuestion];
+      document.getElementById('question').textContent = question.question;
+      const options = document.getElementById('options');
+      options.innerHTML = '';
+      question.options.forEach((option, index) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.textContent = option;
+        div.onclick = () => selectOption(index, div);
+        options.appendChild(div);
+      });
+      updateProgress();
+    }
+
+    function selectOption(index, selectedOption) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+      selectedOption.classList.add('selected');
+      document.getElementById("nextBtn").disabled = false;
+    }
+
+    function nextQuestion() {
+      const selected = document.querySelector('.selected');
+      if (!selected) return;
+      document.getElementById("nextBtn").disabled = true;
+      const correctIndex = questions[currentQuestion].correct;
+      if (selected.textContent === questions[currentQuestion].options[correctIndex]) {
+        selected.classList.add('correct');
+        score += 10;
+      } else {
+        selected.classList.add('wrong');
+      }
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          showQuestion();
+        } else {
+          endQuiz();
         }
+      }, 500);
+    }
 
-        function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById('question').textContent = question.question;
-            const options = document.getElementById('options');
-            options.innerHTML = '';
-            
-            question.options.forEach((option, index) => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.textContent = option;
-                div.onclick = () => selectOption(index);
-                options.appendChild(div);
-            });
-            
-            updateProgress();
-        }
+    function updateProgress() {
+      document.getElementById('progress').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+    }
 
-        function selectOption(index) {
-            const options = document.querySelectorAll('.option');
-            options.forEach(opt => opt.classList.remove('selected'));
-            options[index].classList.add('selected');
-        }
+    function endQuiz() {
+      const name = prompt(`Quiz voltooid! Score: ${score}\nVoer je naam in:`);
+      if (name) {
+        db.collection("leaderboard").add({
+          name,
+          score,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => showLeaderboard());
+      }
+    }
 
-        function nextQuestion() {
-            const selected = document.querySelector('.selected');
-            if (!selected) return;
+    function showLeaderboard() {
+      document.querySelector('.quiz-container').style.display = 'none';
+      document.querySelector('.leaderboard').style.display = 'block';
+      db.collection("leaderboard")
+        .orderBy("score", "desc")
+        .limit(10)
+        .onSnapshot((snapshot) => {
+          const leaderboard = document.getElementById('leaderboard');
+          leaderboard.innerHTML = '';
+          if (snapshot.empty) {
+            leaderboard.innerHTML = '<li>Geen scores beschikbaar</li>';
+            return;
+          }
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const li = document.createElement('li');
+            li.textContent = `${data.name}: ${data.score} punten`;
+            leaderboard.appendChild(li);
+          });
+        });
+    }
 
-            const correct = questions[currentQuestion].correct;
-            if (selected.textContent === questions[currentQuestion].options[correct]) {
-                score += 10;
-            }
-
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                showQuestion();
-            } else {
-                endQuiz();
-            }
-        }
-
-        function updateProgress() {
-            const progress = (currentQuestion / questions.length) * 100;
-            document.getElementById('progress').style.width = `${progress}%`;
-        }
-
-        function endQuiz() {
-            document.querySelector('.quiz-container').style.display = 'none';
-            const name = prompt(`Quiz voltooid! Score: ${score}\nVoer je naam in:`);
-            addToLeaderboard(name || "Anoniem", score);
-            showLeaderboard();
-            resetQuiz();
-        }
-
-        function addToLeaderboard(name, score) {
-            let leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-            leaderboard.push({name, score});
-            leaderboard.sort((a,b) => b.score - a.score);
-            leaderboard = leaderboard.slice(0, 10);
-            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
-            showLeaderboard();
-        }
-
-        function showLeaderboard() {
-            const leaderboard = JSON.parse(localStorage.getItem('leaderboard') || '[]');
-            const ol = document.getElementById('leaderboard');
-            ol.innerHTML = leaderboard.map(entry => 
-                `<li>${entry.name}: ${entry.score} punten</li>`
-            ).join('');
-        }
-
-        function resetQuiz() {
-            currentQuestion = 0;
-            score = 0;
-            document.querySelector('.start-screen').style.display = 'block';
-            document.getElementById('progress').style.width = '0%';
-        }
-
-        showLeaderboard();
-    </script>
+    function resetLeaderboard() {
+      db.collection("leaderboard").get().then(snapshot => {
+        snapshot.forEach(doc => doc.ref.delete());
+      });
+      document.getElementById('leaderboard').innerHTML = '<li>Geen scores beschikbaar</li>';
+    }
+  </script>
 </body>
 </html>
