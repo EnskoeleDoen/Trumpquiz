@@ -238,17 +238,25 @@
 
         function endQuiz() {
             const name = prompt(`Quiz voltooid! Score: ${score}\nVoer je naam in:`);
-            if (name) db.collection("leaderboard").add({ name, score, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
-            showLeaderboard();
-        }
-
-        function resetLeaderboard() {
-            db.collection("leaderboard").get().then(snapshot => snapshot.forEach(doc => doc.ref.delete()));
+            if (name) {
+                db.collection("leaderboard").add({ name, score, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+                    .then(() => showLeaderboard());
+            }
         }
 
         function showLeaderboard() {
             document.querySelector('.quiz-container').style.display = 'none';
             document.querySelector('.leaderboard').style.display = 'block';
+
+            db.collection("leaderboard").orderBy("score", "desc").limit(10).get()
+                .then(snapshot => {
+                    document.getElementById('leaderboard').innerHTML = snapshot.empty ? '<li>Geen scores beschikbaar</li>' :
+                        snapshot.docs.map(doc => `<li>${doc.data().name}: ${doc.data().score} punten</li>`).join('');
+                });
+        }
+
+        function resetLeaderboard() {
+            db.collection("leaderboard").get().then(snapshot => snapshot.forEach(doc => doc.ref.delete()));
         }
     </script>
 </body>
