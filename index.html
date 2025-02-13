@@ -244,19 +244,39 @@
             }
         }
 
+        // Live leaderboard updates
         function showLeaderboard() {
             document.querySelector('.quiz-container').style.display = 'none';
             document.querySelector('.leaderboard').style.display = 'block';
 
-            db.collection("leaderboard").orderBy("score", "desc").limit(10).get()
-                .then(snapshot => {
-                    document.getElementById('leaderboard').innerHTML = snapshot.empty ? '<li>Geen scores beschikbaar</li>' :
-                        snapshot.docs.map(doc => `<li>${doc.data().name}: ${doc.data().score} punten</li>`).join('');
+            db.collection("leaderboard")
+                .orderBy("score", "desc")
+                .limit(10)
+                .onSnapshot((snapshot) => {
+                    const leaderboard = document.getElementById('leaderboard');
+                    leaderboard.innerHTML = '';
+
+                    if (snapshot.empty) {
+                        leaderboard.innerHTML = '<li>Geen scores beschikbaar</li>';
+                        return;
+                    }
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        const li = document.createElement('li');
+                        li.textContent = `${data.name}: ${data.score} punten`;
+                        leaderboard.appendChild(li);
+                    });
                 });
         }
 
+        // Leaderboard resetten en direct updaten
         function resetLeaderboard() {
-            db.collection("leaderboard").get().then(snapshot => snapshot.forEach(doc => doc.ref.delete()));
+            db.collection("leaderboard").get().then(snapshot => {
+                snapshot.forEach(doc => doc.ref.delete());
+            });
+
+            document.getElementById('leaderboard').innerHTML = '<li>Geen scores beschikbaar</li>';
         }
     </script>
 </body>
