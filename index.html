@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Robin Quiz</title>
   <style>
+    /* Achtergrond met subtiele, geanimeerde gradient (grijs en blauw) */
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #3a3a3a, #283e51);
@@ -31,6 +32,7 @@
       border-radius: 15px;
       text-align: center;
       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      /* Zoom/blur effecten verwijderd */
     }
     .btn {
       background: linear-gradient(45deg, #4b79a1, #283e51);
@@ -50,19 +52,33 @@
       transform: scale(1.05);
       box-shadow: 0 6px 12px rgba(0,0,0,0.4);
     }
+    .quiz-container, .leaderboard, .name-container {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .question {
+      font-size: 1.5em;
+      margin-bottom: 15px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
     .option {
       background: rgba(128, 128, 128, 0.2);
       padding: 12px;
       margin: 5px;
       border-radius: 10px;
       cursor: pointer;
-      transition: transform 0.2s, background 0.3s;
+      transition: background 0.3s, transform 0.2s;
       text-align: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     .option:hover {
       background: rgba(128, 128, 128, 0.3);
       transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
     .option.selected {
       background: #007bff;
@@ -75,28 +91,267 @@
     .option.wrong {
       background: #dc3545 !important;
     }
+    .progress-bar {
+      background: rgba(128, 128, 128, 0.2);
+      width: 100%;
+      height: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      position: relative;
+    }
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, #283e51, #4b79a1);
+      width: 0%;
+      border-radius: 5px;
+      transition: width 0.3s ease-in-out;
+      position: relative;
+    }
+    .progress::after {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: -5px;
+      width: 20px;
+      height: calc(100% + 10px);
+      background: radial-gradient(circle, rgba(0,123,255,1) 0%, rgba(0,123,255,0.7) 60%, transparent 70%);
+      filter: blur(2px);
+      animation: flame 0.8s infinite alternate;
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    @keyframes flame {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.2) rotate(10deg); opacity: 0.8; }
+    }
+    .leaderboard ol, .name-container ol {
+      padding: 0;
+      list-style-type: none;
+    }
+    .leaderboard li {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 10px;
+    }
+    /* Speciale aanduidingen voor 1e, 2e en 3e plaats */
     .leaderboard li:nth-child(1) {
-      background: #ffd700;
+      background: #ffd700; /* goud */
       color: #000;
     }
     .leaderboard li:nth-child(2) {
-      background: #c0c0c0;
+      background: #c0c0c0; /* zilver */
       color: #000;
     }
     .leaderboard li:nth-child(3) {
-      background: #cd7f32;
+      background: #cd7f32; /* brons */
       color: #000;
     }
+    .name-container input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 10px;
+      border: none;
+      margin: 10px 0;
+      width: 80%;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    @media (max-width: 600px) {
+      .container {
+        width: 95%;
+        padding: 15px;
+      }
+      .btn {
+        font-size: 14px;
+        padding: 10px 16px;
+      }
+      .option {
+        font-size: 14px;
+        padding: 10px;
+      }
+    }
   </style>
+  
+  <!-- Firebase SDK's -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="container">
+    <!-- Startscherm -->
     <div class="start-screen">
       <h1>Robin Quiz</h1>
       <button class="btn" onclick="startQuiz()">Start Quiz</button>
       <br>
       <button class="btn" onclick="goToLeaderboard()">Ga naar leaderboard</button>
     </div>
+
+    <!-- Quiz -->
+    <div class="quiz-container">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+      </div>
+      <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Volgende</button>
+    </div>
+
+    <!-- Naam invoer na quiz -->
+    <div class="name-container" id="nameContainer">
+      <h2>Quiz voltooid!</h2>
+      <p>Je score is: <span id="finalScore"></span></p>
+      <p>Vul je naam in:</p>
+      <input type="text" id="nameInput" placeholder="Je naam" />
+      <br>
+      <button class="btn" onclick="submitName()">Verzenden</button>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard">
+      <h2>Leaderboard</h2>
+      <ol id="leaderboard"></ol>
+      <br>
+      <button class="btn" onclick="goHome()">Home</button>
+    </div>
   </div>
+
+  <script>
+    // Firebase configuratie
+    const firebaseConfig = {
+      apiKey: "AIzaSyB170btCZ5e4OKIDUToAPF445Ima-3H208",
+      authDomain: "quiz-robin.firebaseapp.com",
+      projectId: "quiz-robin",
+      storageBucket: "quiz-robin.firebasestorage.app",
+      messagingSenderId: "233143883084",
+      appId: "1:233143883084:web:372c88f5044cf99df7ebe9"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+
+    let currentQuestion = 0;
+    let score = 0;
+    const questions = [
+      { question: "Wat is mijn geboorteplaats?", options: ["Wilrijk", "Willebroek", "Boom", "Schelle"], correct: 0 },
+      { question: "Welke instrument speel ik?", options: ["Drum", "piano", "trompet", "viool"], correct: 1 },
+      { question: "Welk huisdier heb ik?", options: ["Hond", "Kat", "Vissen", "Konijn"], correct: 1 },
+      { question: "Wat is mijn verjaardag?", options: ["6 Juni", "9 juni", "6 juli", "9 juli"], correct: 2 },
+      { question: "Wat is mijn geboortejaar?", options: ["2000", "2001", "2002", "2003"], correct: 2 }
+    ];
+
+    function startQuiz() {
+      // Verberg startscherm en andere containers
+      document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.leaderboard').style.display = 'none';
+      document.getElementById('nameContainer').style.display = 'none';
+      document.querySelector('.quiz-container').style.display = 'block';
+      currentQuestion = 0;
+      score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const question = questions[currentQuestion];
+      document.getElementById('question').textContent = question.question;
+      const options = document.getElementById('options');
+      options.innerHTML = '';
+      question.options.forEach((option, index) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.textContent = option;
+        div.onclick = () => selectOption(index, div);
+        options.appendChild(div);
+      });
+      updateProgress();
+    }
+
+    function selectOption(index, selectedOption) {
+      document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+      selectedOption.classList.add('selected');
+      document.getElementById("nextBtn").disabled = false;
+    }
+
+    function nextQuestion() {
+      const selected = document.querySelector('.selected');
+      if (!selected) return;
+      document.getElementById("nextBtn").disabled = true;
+      const correctIndex = questions[currentQuestion].correct;
+      if (selected.textContent === questions[currentQuestion].options[correctIndex]) {
+        selected.classList.add('correct');
+        score += 10;
+      } else {
+        selected.classList.add('wrong');
+      }
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+          showQuestion();
+        } else {
+          endQuiz();
+        }
+      }, 500);
+    }
+
+    function updateProgress() {
+      document.getElementById('progress').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+    }
+
+    function endQuiz() {
+      document.querySelector('.quiz-container').style.display = 'none';
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('nameContainer').style.display = 'block';
+    }
+
+    function submitName() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) return;
+      db.collection("leaderboard").add({
+        name,
+        score,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => showLeaderboard());
+    }
+
+    function showLeaderboard() {
+      // Verberg alle andere schermen
+      document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.quiz-container').style.display = 'none';
+      document.getElementById('nameContainer').style.display = 'none';
+      document.querySelector('.leaderboard').style.display = 'block';
+      db.collection("leaderboard")
+        .orderBy("score", "desc")
+        .limit(10)
+        .onSnapshot((snapshot) => {
+          const leaderboard = document.getElementById('leaderboard');
+          leaderboard.innerHTML = '';
+          if (snapshot.empty) {
+            leaderboard.innerHTML = '<li>Geen scores beschikbaar</li>';
+            return;
+          }
+          snapshot.forEach(doc => {
+            const data = doc.data();
+            const li = document.createElement('li');
+            li.textContent = `${data.name}: ${data.score} punten`;
+            leaderboard.appendChild(li);
+          });
+        });
+    }
+
+    function goToLeaderboard() {
+      // Verberg alle andere schermen en laad het leaderboard
+      document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.quiz-container').style.display = 'none';
+      document.getElementById('nameContainer').style.display = 'none';
+      showLeaderboard();
+    }
+
+    function goHome() {
+      // Ga terug naar het startscherm en reset de velden
+      document.querySelector('.leaderboard').style.display = 'none';
+      document.querySelector('.start-screen').style.display = 'block';
+      document.getElementById('nameInput').value = '';
+    }
+  </script>
 </body>
 </html>
