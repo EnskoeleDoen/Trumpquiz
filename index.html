@@ -23,7 +23,7 @@
       padding: 20px;
       border-radius: 10px;
       text-align: center;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
     .btn {
       background: #007bff;
@@ -40,7 +40,7 @@
     .btn:hover {
       background: #0056b3;
     }
-    .quiz-container, .leaderboard {
+    .quiz-container, .leaderboard, .name-container {
       display: none;
     }
     .option {
@@ -99,7 +99,7 @@
       0% { transform: scale(1); opacity: 1; }
       100% { transform: scale(1.2) rotate(10deg); opacity: 0.8; }
     }
-    .leaderboard ol {
+    .leaderboard ol, .name-container ol {
       padding: 0;
       list-style-type: none;
     }
@@ -108,6 +108,14 @@
       padding: 8px;
       margin: 5px 0;
       border-radius: 5px;
+    }
+    .name-container input {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+      margin: 10px 0;
+      width: 80%;
     }
     @media (max-width: 600px) {
       .container {
@@ -142,6 +150,15 @@
         <div class="progress" id="progress"></div>
       </div>
       <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Volgende</button>
+    </div>
+
+    <div class="name-container" id="nameContainer">
+      <h2>Quiz voltooid!</h2>
+      <p>Je score is: <span id="finalScore"></span></p>
+      <p>Vul je naam in:</p>
+      <input type="text" id="nameInput" placeholder="Je naam" />
+      <br>
+      <button class="btn" onclick="submitName()">Verzenden</button>
     </div>
 
     <div class="leaderboard">
@@ -226,18 +243,24 @@
     }
 
     function endQuiz() {
-      const name = prompt(`Quiz voltooid! Score: ${score}\nVoer je naam in:`);
-      if (name) {
-        db.collection("leaderboard").add({
-          name,
-          score,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => showLeaderboard());
-      }
+      // Verberg de quiz en toon het naam invoer scherm
+      document.querySelector('.quiz-container').style.display = 'none';
+      document.getElementById('finalScore').textContent = score;
+      document.getElementById('nameContainer').style.display = 'block';
+    }
+
+    function submitName() {
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name) return;
+      db.collection("leaderboard").add({
+        name,
+        score,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => showLeaderboard());
     }
 
     function showLeaderboard() {
-      document.querySelector('.quiz-container').style.display = 'none';
+      document.getElementById('nameContainer').style.display = 'none';
       document.querySelector('.leaderboard').style.display = 'block';
       db.collection("leaderboard")
         .orderBy("score", "desc")
