@@ -109,13 +109,6 @@
       margin: 5px 0;
       border-radius: 5px;
     }
-    .reset-btn {
-      background: #dc3545;
-      padding: 8px;
-    }
-    .reset-btn:hover {
-      background: #a71d2a;
-    }
     @media (max-width: 600px) {
       .container {
         width: 95%;
@@ -154,7 +147,6 @@
     <div class="leaderboard">
       <h2>Leaderboard</h2>
       <ol id="leaderboard"></ol>
-      <button class="btn reset-btn" onclick="resetLeaderboard()">Reset Leaderboard</button>
     </div>
   </div>
 
@@ -264,13 +256,6 @@
             leaderboard.appendChild(li);
           });
         });
-    }
-
-    function resetLeaderboard() {
-      db.collection("leaderboard").get().then(snapshot => {
-        snapshot.forEach(doc => doc.ref.delete());
-      });
-      document.getElementById('leaderboard').innerHTML = '<li>Geen scores beschikbaar</li>';
     }
   </script>
 </body>
