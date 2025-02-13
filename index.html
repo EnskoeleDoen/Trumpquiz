@@ -150,60 +150,22 @@
             { question: "Wat is mijn geboortejaar?", options: ["2000", "2001", "2002", "2003"], correct: 2 }
         ];
 
-        function startQuiz() {
-            document.querySelector('.start-screen').style.display = 'none';
-            document.querySelector('.quiz-container').style.display = 'block';
-            showQuestion();
-        }
-
-        function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById('question').textContent = question.question;
-            const options = document.getElementById('options');
-            options.innerHTML = '';
-
-            question.options.forEach((option, index) => {
-                const div = document.createElement('div');
-                div.className = 'option';
-                div.textContent = option;
-                div.onclick = () => selectOption(index, div);
-                options.appendChild(div);
-            });
-
-            updateProgress();
-        }
-
-        function selectOption(index, selectedOption) {
-            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
-            selectedOption.classList.add('selected');
-            document.getElementById("nextBtn").disabled = false;
+        function endQuiz() {
+            document.querySelector('.quiz-container').style.display = 'none';
+            const name = prompt(`Quiz voltooid! Score: ${score}\nVoer je naam in:`);
+            if (name) {
+                alert(`${name}, je score is: ${score}`);
+            }
+            location.reload();
         }
 
         function nextQuestion() {
-            const selected = document.querySelector('.selected');
-            if (!selected) return;
-
-            document.getElementById("nextBtn").disabled = true;
-            const correctIndex = questions[currentQuestion].correct;
-            if (selected.textContent === questions[currentQuestion].options[correctIndex]) {
-                selected.classList.add('correct');
-                score += 10;
-            } else {
-                selected.classList.add('wrong');
-            }
-
-            setTimeout(() => {
+            if (currentQuestion < questions.length - 1) {
                 currentQuestion++;
-                if (currentQuestion < questions.length) {
-                    showQuestion();
-                } else {
-                    alert(`Quiz voltooid! Score: ${score}`);
-                }
-            }, 500);
-        }
-
-        function updateProgress() {
-            document.getElementById('progress').style.width = `${(currentQuestion / questions.length) * 100}%`;
+                showQuestion();
+            } else {
+                endQuiz();
+            }
         }
     </script>
 </body>
