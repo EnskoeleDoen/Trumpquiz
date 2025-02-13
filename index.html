@@ -4,22 +4,47 @@
     <meta charset="UTF-8">
     <title>Robin Quiz</title>
     <style>
-        /* Jouw CSS hier */
+        /* CSS-code uit je originele werkende versie */
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        /* ... behoud alle originele CSS-stijlen ... */
     </style>
     
-    <!-- Firebase SDK -->
+    <!-- Firebase SDKs (CRUCIAAL) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Jouw quiz HTML hier -->
+        <div class="start-screen">
+            <h1>Robin Quiz</h1>
+            <img src="robin-profile.jpg" alt="Robin" class="profile-img">
+            <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        </div>
+
+        <div class="quiz-container">
+            <div class="question" id="question"></div>
+            <div class="options" id="options"></div>
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <button class="btn" onclick="nextQuestion()" id="nextBtn">Volgende</button>
+        </div>
+
+        <div class="leaderboard">
+            <h2>Leaderboard</h2>
+            <ol id="leaderboard"></ol>
+        </div>
     </div>
 
     <script>
-        // ========================
-        // FIREBASE CONFIGURATIE
-        // ========================
+        // ================ FIREBASE CONFIG ================
         const firebaseConfig = {
             apiKey: "AIzaSyB170btCZ5e4OKIDUToAPF445Ima-3H208",
             authDomain: "quiz-robin.firebaseapp.com",
@@ -33,9 +58,7 @@
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(app);
 
-        // ========================
-        // QUIZ VARIABELEN
-        // ========================
+        // ================ QUIZ VARIABELEN ================
         let currentQuestion = 0;
         let score = 0;
         const questions = [
@@ -56,9 +79,7 @@
             }
         ];
 
-        // ========================
-        // QUIZ FUNCTIES
-        // ========================
+        // ================ QUIZ FUNCTIES ================
         function startQuiz() {
             document.querySelector('.start-screen').style.display = 'none';
             document.querySelector('.quiz-container').style.display = 'block';
@@ -90,10 +111,13 @@
 
         function nextQuestion() {
             const selected = document.querySelector('.selected');
-            if (!selected) return;
+            if (!selected) {
+                alert("Selecteer eerst een antwoord!");
+                return;
+            }
 
-            const correct = questions[currentQuestion].correct;
-            if (selected.textContent === questions[currentQuestion].options[correct]) {
+            const correctIndex = questions[currentQuestion].correct;
+            if (selected.textContent === questions[currentQuestion].options[correctIndex]) {
                 score += 10;
             }
 
@@ -110,9 +134,7 @@
             document.getElementById('progress').style.width = `${progress}%`;
         }
 
-        // ========================
-        // LEADERBOARD FUNCTIES
-        // ========================
+        // ================ LEADERBOARD ================
         async function addToLeaderboard(name, score) {
             try {
                 await db.collection("leaderboard").add({
@@ -122,6 +144,7 @@
                 });
             } catch (error) {
                 console.error("Fout bij opslaan:", error);
+                alert("Kon score niet opslaan. Controleer je internetverbinding!");
             }
         }
 
@@ -130,17 +153,21 @@
                 .orderBy("score", "desc")
                 .limit(10)
                 .onSnapshot((snapshot) => {
-                    const ol = document.getElementById('leaderboard');
-                    ol.innerHTML = snapshot.docs
+                    const leaderboard = document.getElementById('leaderboard');
+                    leaderboard.innerHTML = snapshot.docs
                         .map(doc => `<li>${doc.data().name}: ${doc.data().score} punten</li>`)
                         .join('');
+                }, (error) => {
+                    console.error("Leaderboard fout:", error);
                 });
         }
 
         function endQuiz() {
             document.querySelector('.quiz-container').style.display = 'none';
-            const name = prompt("Quiz voltooid! Je score: " + score + "\nVoer je naam in voor het leaderboard:");
-            addToLeaderboard(name || "Anoniem", score);
+            const name = prompt(`Quiz voltooid! Score: ${score}\nVoer je naam in:`);
+            if (name) {
+                addToLeaderboard(name, score);
+            }
             showLeaderboard();
             resetQuiz();
         }
@@ -152,9 +179,7 @@
             document.getElementById('progress').style.width = '0%';
         }
 
-        // ========================
-        // INITIALISATIE
-        // ========================
+        // ================ INITIALISATIE ================
         document.addEventListener('DOMContentLoaded', () => {
             showLeaderboard();
         });
