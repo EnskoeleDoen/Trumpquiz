@@ -267,4 +267,11 @@
     }
 
     function resetLeaderboard() {
-
+      db.collection("leaderboard").get().then(snapshot => {
+        snapshot.forEach(doc => doc.ref.delete());
+      });
+      document.getElementById('leaderboard').innerHTML = '<li>Geen scores beschikbaar</li>';
+    }
+  </script>
+</body>
+</html>
