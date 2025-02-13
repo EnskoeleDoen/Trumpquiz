@@ -23,7 +23,7 @@
       padding: 20px;
       border-radius: 10px;
       text-align: center;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
     .btn {
       background: #007bff;
@@ -138,11 +138,15 @@
 </head>
 <body>
   <div class="container">
+    <!-- Startscherm -->
     <div class="start-screen">
       <h1>Robin Quiz</h1>
       <button class="btn" onclick="startQuiz()">Start Quiz</button>
+      <br>
+      <button class="btn" onclick="goToLeaderboard()">Ga naar leaderboard</button>
     </div>
 
+    <!-- Quiz -->
     <div class="quiz-container">
       <div class="question" id="question"></div>
       <div class="options" id="options"></div>
@@ -152,6 +156,7 @@
       <button class="btn" onclick="nextQuestion()" id="nextBtn" disabled>Volgende</button>
     </div>
 
+    <!-- Naam invoer na quiz -->
     <div class="name-container" id="nameContainer">
       <h2>Quiz voltooid!</h2>
       <p>Je score is: <span id="finalScore"></span></p>
@@ -161,9 +166,12 @@
       <button class="btn" onclick="submitName()">Verzenden</button>
     </div>
 
+    <!-- Leaderboard -->
     <div class="leaderboard">
       <h2>Leaderboard</h2>
       <ol id="leaderboard"></ol>
+      <br>
+      <button class="btn" onclick="goHome()">Home</button>
     </div>
   </div>
 
@@ -191,8 +199,13 @@
     ];
 
     function startQuiz() {
+      // Verberg startscherm en eventuele andere containers
       document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.leaderboard').style.display = 'none';
+      document.getElementById('nameContainer').style.display = 'none';
       document.querySelector('.quiz-container').style.display = 'block';
+      currentQuestion = 0;
+      score = 0;
       showQuestion();
     }
 
@@ -243,7 +256,6 @@
     }
 
     function endQuiz() {
-      // Verberg de quiz en toon het naam invoer scherm
       document.querySelector('.quiz-container').style.display = 'none';
       document.getElementById('finalScore').textContent = score;
       document.getElementById('nameContainer').style.display = 'block';
@@ -260,6 +272,9 @@
     }
 
     function showLeaderboard() {
+      // Verberg alle andere schermen
+      document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.quiz-container').style.display = 'none';
       document.getElementById('nameContainer').style.display = 'none';
       document.querySelector('.leaderboard').style.display = 'block';
       db.collection("leaderboard")
@@ -279,6 +294,21 @@
             leaderboard.appendChild(li);
           });
         });
+    }
+
+    function goToLeaderboard() {
+      // Verberg alle andere schermen en laad het leaderboard
+      document.querySelector('.start-screen').style.display = 'none';
+      document.querySelector('.quiz-container').style.display = 'none';
+      document.getElementById('nameContainer').style.display = 'none';
+      showLeaderboard();
+    }
+
+    function goHome() {
+      // Ga terug naar het startscherm en reset de velden
+      document.querySelector('.leaderboard').style.display = 'none';
+      document.querySelector('.start-screen').style.display = 'block';
+      document.getElementById('nameInput').value = '';
     }
   </script>
 </body>
