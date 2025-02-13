@@ -5,9 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Robin Quiz</title>
   <style>
+    /* Achtergrond met subtiele animatie in grijs en blauw */
     body {
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      background: linear-gradient(135deg, #3a3a3a, #283e51);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
       color: white;
       margin: 0;
       padding: 20px;
@@ -16,6 +19,11 @@
       justify-content: center;
       align-items: center;
     }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     .container {
       width: 90%;
       max-width: 500px;
@@ -23,11 +31,11 @@
       padding: 20px;
       border-radius: 15px;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(10px);
     }
     .btn {
-      background: #ff6600;
+      background: linear-gradient(45deg, #4b79a1, #283e51);
       color: white;
       border: none;
       padding: 12px 20px;
@@ -39,14 +47,14 @@
       display: inline-block;
     }
     .btn:hover {
-      background: #cc5200;
+      background: linear-gradient(45deg, #3a5f8a, #1d2f3d);
       transform: scale(1.05);
     }
     .quiz-container, .leaderboard, .name-container {
       display: none;
     }
     .option {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(128, 128, 128, 0.2);
       padding: 12px;
       margin: 5px;
       border-radius: 10px;
@@ -55,7 +63,7 @@
       text-align: center;
     }
     .option:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: rgba(128, 128, 128, 0.3);
       transform: scale(1.05);
     }
     .option.selected {
@@ -70,7 +78,7 @@
       background: #dc3545 !important;
     }
     .progress-bar {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(128, 128, 128, 0.2);
       width: 100%;
       height: 10px;
       border-radius: 5px;
@@ -79,7 +87,7 @@
     }
     .progress {
       height: 100%;
-      background: linear-gradient(90deg, #ff6600, #ffcc00);
+      background: linear-gradient(90deg, #283e51, #4b79a1);
       width: 0%;
       border-radius: 5px;
       transition: width 0.3s ease-in-out;
@@ -92,7 +100,7 @@
       top: -5px;
       width: 20px;
       height: calc(100% + 10px);
-      background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(255,165,0,0.7) 60%, transparent 70%);
+      background: radial-gradient(circle, rgba(0,123,255,1) 0%, rgba(0,123,255,0.7) 60%, transparent 70%);
       filter: blur(2px);
       animation: flame 0.8s infinite alternate;
       pointer-events: none;
@@ -111,6 +119,19 @@
       padding: 10px;
       margin: 5px 0;
       border-radius: 10px;
+    }
+    /* Speciale aanduidingen voor 1e, 2e en 3e plaats */
+    .leaderboard li:nth-child(1) {
+      background: #ffd700; /* goud */
+      color: #000;
+    }
+    .leaderboard li:nth-child(2) {
+      background: #c0c0c0; /* zilver */
+      color: #000;
+    }
+    .leaderboard li:nth-child(3) {
+      background: #cd7f32; /* brons */
+      color: #000;
     }
     .name-container input {
       padding: 10px;
@@ -205,7 +226,7 @@
     ];
 
     function startQuiz() {
-      // Verberg startscherm en eventuele andere containers
+      // Verberg startscherm en andere containers
       document.querySelector('.start-screen').style.display = 'none';
       document.querySelector('.leaderboard').style.display = 'none';
       document.getElementById('nameContainer').style.display = 'none';
